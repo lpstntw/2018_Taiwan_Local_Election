@@ -1,0 +1,55 @@
+---
+title: "Local Election"
+author: "Po-Sheng Lee"
+date: "2018/12/20"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(readxl)
+library(magrittr)
+
+```
+
+```{r tidy2018 data}
+
+newtaipei_2018 <- read_excel("data/縣表3-1-200(新北市).xls")
+newtaipei_2018 %<>%
+  rename("行政區別" = `107年新北市市長選舉候選人在各投開票所得票數一覽表`, "里別" = X__1, 
+         "民進黨候選人得票數" = X__3, "國民黨候選人得票數" = X__4, "投票數" = X__7) %>%
+  mutate(選舉年份 = 2018, 縣市別 = "新北市", 國民黨候選人 = "侯友宜", 民進黨候選人 = "蘇貞昌",
+             民進黨候選人得票數 = as.numeric(民進黨候選人得票數), 
+             國民黨候選人得票數 = as.numeric(國民黨候選人得票數),
+             投票數 = as.numeric(投票數)) %>%
+  select(選舉年份, 縣市別, 行政區別, 里別, 國民黨候選人, 民進黨候選人, 
+             國民黨候選人得票數, 民進黨候選人得票數, 投票數) %>%
+  na.omit() %>%
+  group_by(里別) %>%
+  mutate(國民黨候選人得票數 = sum(國民黨候選人得票數), 民進黨候選人得票數 = sum(民進黨候選人得票數),
+                     投票數 = sum(投票數)) %>%
+  distinct(里別, .keep_all = T) %>%
+  ungroup()
+
+
+```
+
+```{r data import}
+
+taipei_2010 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2010台北")
+taipei_2014 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2014台北")
+kaoshung_2010 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2010高雄")
+kaoshung_2014 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2014高雄")
+
+```
+
+
+
+```{r datapoint}
+
+```
+
+```{r ethinicity}
+
+```
