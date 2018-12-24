@@ -11,27 +11,171 @@ library(tidyverse)
 library(readxl)
 library(magrittr)
 
+
 ```
 
 ```{r tidy2018 data}
 
+#台北
+taipei_2018 <- read_excel("data/縣表3-1-100(臺北市).xls")
+taipei_2018 %<>%
+  rename("行政區別" = `107年臺北市市長選舉候選人在各投開票所得票數一覽表`, "里別" = X__1, 
+         "民進黨候選人得票數" = X__5, "國民黨候選人得票數" = X__4, "無黨籍候選人得票數" = X__6, 
+         "投票數" = X__10) %>%
+  map(~gsub('\\s+', '',x = .)) %>% 
+  as_data_frame() %>%
+  mutate(選舉年份 = 2018, 縣市別 = "台北市", 
+             國民黨候選人 = "丁守中", 民進黨候選人 = "姚文智", 無黨籍候選人 = "柯文哲",
+             民進黨候選人得票數 = as.numeric(民進黨候選人得票數), 
+             國民黨候選人得票數 = as.numeric(國民黨候選人得票數),
+             無黨籍候選人得票數 = as.numeric(無黨籍候選人得票數),
+             投票數 = as.numeric(投票數)) %>%
+  select(選舉年份, 縣市別, 行政區別, 里別, 國民黨候選人, 民進黨候選人, 無黨籍候選人,
+             國民黨候選人得票數, 民進黨候選人得票數, 無黨籍候選人得票數, 投票數) %>%
+  drop_na() %>%
+  group_by(行政區別, 里別) %>%
+  mutate(國民黨候選人得票數 = sum(國民黨候選人得票數), 民進黨候選人得票數 = sum(民進黨候選人得票數),
+                  無黨籍候選人得票數 = sum(無黨籍候選人得票數), 投票數 = sum(投票數)) %>%
+  distinct(行政區別, 里別, .keep_all = T) %>%
+  ungroup()
+
+taipei_2018 %<>%
+  mutate(國民黨候選人得票率 = 國民黨候選人得票數/投票數, 民進黨候選人得票率 = 民進黨候選人得票數/投票數,
+                  無黨籍候選人得票率 = 無黨籍候選人得票數/投票數, 
+                  政黨色 = case_when(
+                    國民黨候選人得票數 > 無黨籍候選人得票數 & 國民黨候選人得票數 > 民進黨候選人得票數 ~ "Blue",
+                    無黨籍候選人得票數 > 國民黨候選人得票數 & 無黨籍候選人得票數 > 民進黨候選人得票數 ~ "Grey",
+                    民進黨候選人得票數 > 無黨籍候選人得票數 & 民進黨候選人得票數 > 國民黨候選人得票數 ~ "Green"))
+write_excel_csv(taipei_2018, "data/2018台北市候選人得票概況（村里別）")
+
+#新北
 newtaipei_2018 <- read_excel("data/縣表3-1-200(新北市).xls")
 newtaipei_2018 %<>%
   rename("行政區別" = `107年新北市市長選舉候選人在各投開票所得票數一覽表`, "里別" = X__1, 
          "民進黨候選人得票數" = X__3, "國民黨候選人得票數" = X__4, "投票數" = X__7) %>%
+  map(~gsub('\\s+', '',x = .)) %>% 
+  as_data_frame() %>%
   mutate(選舉年份 = 2018, 縣市別 = "新北市", 國民黨候選人 = "侯友宜", 民進黨候選人 = "蘇貞昌",
              民進黨候選人得票數 = as.numeric(民進黨候選人得票數), 
              國民黨候選人得票數 = as.numeric(國民黨候選人得票數),
              投票數 = as.numeric(投票數)) %>%
   select(選舉年份, 縣市別, 行政區別, 里別, 國民黨候選人, 民進黨候選人, 
              國民黨候選人得票數, 民進黨候選人得票數, 投票數) %>%
-  na.omit() %>%
-  group_by(里別) %>%
+  drop_na() %>%
+  group_by(行政區別, 里別) %>%
   mutate(國民黨候選人得票數 = sum(國民黨候選人得票數), 民進黨候選人得票數 = sum(民進黨候選人得票數),
                      投票數 = sum(投票數)) %>%
-  distinct(里別, .keep_all = T) %>%
+  distinct(行政區別, 里別, .keep_all = T) %>%
   ungroup()
 
+newtaipei_2018 %<>%
+  mutate(國民黨候選人得票率 = 國民黨候選人得票數/投票數, 民進黨候選人得票率 = 民進黨候選人得票數/投票數,
+                  `得票率差（百分點）` = (國民黨候選人得票率 - 民進黨候選人得票率)*100, 
+                  得票數差 = 國民黨候選人得票數 - 民進黨候選人得票數,
+                  政黨色 = if_else(得票數差 > 0, "Blue", "Green"))
+write_excel_csv(newtaipei_2018, "data/2018新北市候選人得票概況（村里別）")
+
+#桃園
+taoyuan_2018 <- read_excel("data/縣表3-1-300(桃園市).xls")
+taoyuan_2018 %<>%
+  rename("行政區別" = `107年桃園市市長選舉候選人在各投開票所得票數一覽表`, "里別" = X__1, 
+         "民進黨候選人得票數" = X__7, "國民黨候選人得票數" = X__4, "投票數" = X__10) %>%
+  map(~gsub('\\s+', '',x = .)) %>% 
+  as_data_frame() %>%
+  mutate(選舉年份 = 2018, 縣市別 = "桃園市", 國民黨候選人 = "陳學聖", 民進黨候選人 = "鄭文燦",
+             民進黨候選人得票數 = as.numeric(民進黨候選人得票數), 
+             國民黨候選人得票數 = as.numeric(國民黨候選人得票數),
+             投票數 = as.numeric(投票數)) %>%
+  select(選舉年份, 縣市別, 行政區別, 里別, 國民黨候選人, 民進黨候選人, 
+             國民黨候選人得票數, 民進黨候選人得票數, 投票數) %>%
+  drop_na() %>%
+  group_by(行政區別, 里別) %>%
+  mutate(國民黨候選人得票數 = sum(國民黨候選人得票數), 民進黨候選人得票數 = sum(民進黨候選人得票數),
+                     投票數 = sum(投票數)) %>%
+  distinct(行政區別, 里別, .keep_all = T) %>%
+  ungroup() %>%
+  mutate(國民黨候選人得票率 = 國民黨候選人得票數/投票數, 民進黨候選人得票率 = 民進黨候選人得票數/投票數,
+                  `得票率差（百分點）` = (國民黨候選人得票率 - 民進黨候選人得票率)*100, 
+                  得票數差 = 國民黨候選人得票數 - 民進黨候選人得票數,
+                  政黨色 = if_else(得票數差 > 0, "Blue", "Green"))
+write_excel_csv(taoyuan_2018, "data/2018桃園市候選人得票概況（村里別）")
+
+#台中
+taichung_2018 <- read_excel("data/縣表3-1-400(臺中市).xls")
+taichung_2018 %<>%
+  rename("行政區別" = `107年臺中市市長選舉候選人在各投開票所得票數一覽表`, "里別" = X__1, 
+         "民進黨候選人得票數" = X__4, "國民黨候選人得票數" = X__5, "投票數" = X__8) %>%
+  map(~gsub('\\s+', '',x = .)) %>% 
+  as_data_frame() %>%
+  mutate(選舉年份 = 2018, 縣市別 = "台中市", 國民黨候選人 = "盧秀燕", 民進黨候選人 = "林佳龍",
+             民進黨候選人得票數 = as.numeric(民進黨候選人得票數), 
+             國民黨候選人得票數 = as.numeric(國民黨候選人得票數),
+             投票數 = as.numeric(投票數)) %>%
+  select(選舉年份, 縣市別, 行政區別, 里別, 國民黨候選人, 民進黨候選人, 
+             國民黨候選人得票數, 民進黨候選人得票數, 投票數) %>%
+  drop_na() %>%
+  group_by(行政區別, 里別) %>%
+  mutate(國民黨候選人得票數 = sum(國民黨候選人得票數), 民進黨候選人得票數 = sum(民進黨候選人得票數),
+                     投票數 = sum(投票數)) %>%
+  distinct(行政區別, 里別, .keep_all = T) %>%
+  ungroup() %>%
+  mutate(國民黨候選人得票率 = 國民黨候選人得票數/投票數, 民進黨候選人得票率 = 民進黨候選人得票數/投票數,
+                  `得票率差（百分點）` = (國民黨候選人得票率 - 民進黨候選人得票率)*100, 
+                  得票數差 = 國民黨候選人得票數 - 民進黨候選人得票數,
+                  政黨色 = if_else(得票數差 > 0, "Blue", "Green"))
+write_excel_csv(taoyuan_2018, "data/2018台中市候選人得票概況（村里別）")
+
+#台南
+tainan_2018 <- read_excel("data/縣表3-1-500(臺南市).xls")
+tainan_2018 %<>%
+  rename("行政區別" = `107年臺南市市長選舉候選人在各投開票所得票數一覽表`, "里別" = X__1, 
+         "民進黨候選人得票數" = X__3, "國民黨候選人得票數" = X__4, "投票數" = X__11) %>%
+  map(~gsub('\\s+', '',x = .)) %>% 
+  as_data_frame() %>%
+  mutate(選舉年份 = 2018, 縣市別 = "台南市", 國民黨候選人 = "高思博", 民進黨候選人 = "黃偉哲",
+             民進黨候選人得票數 = as.numeric(民進黨候選人得票數), 
+             國民黨候選人得票數 = as.numeric(國民黨候選人得票數),
+             投票數 = as.numeric(投票數)) %>%
+  select(選舉年份, 縣市別, 行政區別, 里別, 國民黨候選人, 民進黨候選人, 
+             國民黨候選人得票數, 民進黨候選人得票數, 投票數) %>%
+  drop_na() %>%
+  group_by(行政區別, 里別) %>%
+  mutate(國民黨候選人得票數 = sum(國民黨候選人得票數), 民進黨候選人得票數 = sum(民進黨候選人得票數),
+                     投票數 = sum(投票數)) %>%
+  distinct(行政區別, 里別, .keep_all = T) %>%
+  ungroup() %>%
+  mutate(國民黨候選人得票率 = 國民黨候選人得票數/投票數, 民進黨候選人得票率 = 民進黨候選人得票數/投票數,
+                  `得票率差（百分點）` = (國民黨候選人得票率 - 民進黨候選人得票率)*100, 
+                  得票數差 = 國民黨候選人得票數 - 民進黨候選人得票數,
+                  政黨色 = if_else(得票數差 > 0, "Blue", "Green"))
+write_excel_csv(taoyuan_2018, "data/2018台南市候選人得票概況（村里別）")
+
+#高雄
+kaoshung_2018 <- read_excel("data/縣表3-1-600(高雄市).xls")
+kaoshung_2018 %<>%
+  rename("行政區別" = `107年高雄市市長選舉候選人在各投開票所得票數一覽表`, "里別" = X__1, 
+         "民進黨候選人得票數" = X__4, "國民黨候選人得票數" = X__3, "投票數" = X__9) %>%
+  # delete the white space for further use 
+  # map function shortcut with ~ 
+  map(~gsub('\\s+', '',x = .)) %>% 
+  as_data_frame() %>%
+  mutate(選舉年份 = 2018, 縣市別 = "高雄市", 國民黨候選人 = "韓國瑜", 民進黨候選人 = "陳其邁",
+             民進黨候選人得票數 = as.numeric(民進黨候選人得票數), 
+             國民黨候選人得票數 = as.numeric(國民黨候選人得票數),
+             投票數 = as.numeric(投票數)) %>%
+  select(選舉年份, 縣市別, 行政區別, 里別, 國民黨候選人, 民進黨候選人, 
+             國民黨候選人得票數, 民進黨候選人得票數, 投票數) %>%
+  drop_na() %>%
+  group_by(行政區別, 里別) %>%
+  mutate(國民黨候選人得票數 = sum(國民黨候選人得票數), 民進黨候選人得票數 = sum(民進黨候選人得票數),
+                     投票數 = sum(投票數)) %>%
+  distinct(行政區別, 里別, .keep_all = T) %>%
+  ungroup() %>%
+  mutate(國民黨候選人得票率 = 國民黨候選人得票數/投票數, 民進黨候選人得票率 = 民進黨候選人得票數/投票數,
+                  `得票率差（百分點）` = (國民黨候選人得票率 - 民進黨候選人得票率)*100, 
+                  得票數差 = 國民黨候選人得票數 - 民進黨候選人得票數,
+                  政黨色 = if_else(得票數差 > 0, "Blue", "Green"))
+write_excel_csv(taoyuan_2018, "data/2018高雄市候選人得票概況（村里別）")
 
 ```
 
@@ -39,6 +183,14 @@ newtaipei_2018 %<>%
 
 taipei_2010 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2010台北")
 taipei_2014 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2014台北")
+newtaipei_2010 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2010新北")
+newtaipei_2014 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2014新北")
+taoyuan_2009 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2009桃園")
+taoyuan_2014 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2014桃園")
+taichung_2010 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2010台中")
+taichung_2014 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2014台中")
+tainan_2010 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2010台南")
+tainan_2014 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2014台南")
 kaoshung_2010 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2010高雄")
 kaoshung_2014 <- read_excel("data/近3屆六都縣市長候選人得票概況（村里別）.xlsx", sheet = "2014高雄")
 
@@ -46,10 +198,107 @@ kaoshung_2014 <- read_excel("data/近3屆六都縣市長候選人得票概況（
 
 
 
-```{r datapoint}
+```{r combine data}
+
+vote_combination <- function(x_2010,x_2014,x_2018){
+  x_2010 %<>%
+    select(縣市別, 行政區別, 里別, 國民黨候選人得票數, 民進黨候選人得票數, 投票數, 
+              國民黨候選人得票率, 民進黨候選人得票率) %>%
+    rename(city = 縣市別, district = 行政區別, neighbor = 里別, 
+           KMTvote_2010 = 國民黨候選人得票數, DDPvote_2010 = 民進黨候選人得票數,
+           ballot_2010 = 投票數, KMTrate_2010 = 國民黨候選人得票率, DDPrate_2010 = 民進黨候選人得票率) %>%
+    unite(city, district, neighbor, col = "neighbor", sep = "/")
+  x_2014 %<>%
+    select(縣市別, 行政區別, 里別, 國民黨候選人得票數, 民進黨候選人得票數, 投票數, 
+              國民黨候選人得票率, 民進黨候選人得票率) %>%
+    rename(city = 縣市別, district = 行政區別, neighbor = 里別, 
+           KMTvote_2014 = 國民黨候選人得票數, DDPvote_2014 = 民進黨候選人得票數, ballot_2014 = 投票數, 
+           KMTrate_2014 = 國民黨候選人得票率, DDPrate_2014 = 民進黨候選人得票率) %>%
+    unite(city, district, neighbor, col = "neighbor", sep = "/")
+  x_2018 %<>%
+    select(縣市別, 行政區別, 里別, 國民黨候選人得票數, 民進黨候選人得票數, 投票數, 
+              國民黨候選人得票率, 民進黨候選人得票率) %>%
+    rename(city = 縣市別, district = 行政區別, neighbor = 里別, 
+           KMTvote_2018 = 國民黨候選人得票數, DDPvote_2018 = 民進黨候選人得票數, ballot_2018 = 投票數, 
+           KMTrate_2018 = 國民黨候選人得票率, DDPrate_2018 = 民進黨候選人得票率) %>%
+    unite(city, district, neighbor, col = "neighbor", sep = "/")
+  z <- x_2018 %>%
+    left_join(x_2014, by = "neighbor") %>%
+    left_join(x_2010, by = "neighbor") %>%
+    separate(neighbor, into = c("city", "district", "neighbor"))
+  return(z)
+}
+
+newtaipei_2010_to_2018 <- vote_combination(newtaipei_2010, newtaipei_2014, newtaipei_2018)
+taoyuan_2010_to_2018 <- vote_combination(taoyuan_2009, taoyuan_2014, taoyuan_2018)
+taichung_2010_to_2018 <- vote_combination(taichung_2010, taichung_2014, taichung_2018)
+
+kaoshung_working_2010 <- kaoshung_2010 %>%
+  select(縣市別, 行政區別, 里別, 國民黨候選人得票數, 民進黨候選人得票數, 無黨籍候選人得票數, 
+            投票數, 國民黨候選人得票率, 民進黨候選人得票率, 無黨籍候選人得票率) %>%
+  rename(city = 縣市別, district = 行政區別, neighbor = 里別, 
+         KMTvote_2010 = 國民黨候選人得票數, DDPvote_2010 = 民進黨候選人得票數, NPvote_2010 = 無黨籍候選人得票數,
+         ballot_2010 = 投票數, KMTrate_2010 = 國民黨候選人得票率, DDPrate_2010 = 民進黨候選人得票率, 
+         NPrate_2010 = 無黨籍候選人得票率) %>%
+  unite(city, district, neighbor, col = "neighbor", sep = "/") # For joining the data
+
+kaoshung_working_2014 <- kaoshung_2014 %>%
+  select(縣市別, 行政區別, 里別, 國民黨候選人得票數, 民進黨候選人得票數, 投票數, 
+            國民黨候選人得票率, 民進黨候選人得票率) %>%
+  rename(city = 縣市別, district = 行政區別, neighbor = 里別, 
+         KMTvote_2014 = 國民黨候選人得票數, DDPvote_2014 = 民進黨候選人得票數, ballot_2014 = 投票數, 
+         KMTrate_2014 = 國民黨候選人得票率, DDPrate_2014 = 民進黨候選人得票率) %>%
+  unite(city, district, neighbor, col = "neighbor", sep = "/")
+
+kaoshung_working_2018 <- kaoshung_2018 %>%
+  select(縣市別, 行政區別, 里別, 國民黨候選人得票數, 民進黨候選人得票數, 投票數, 
+            國民黨候選人得票率, 民進黨候選人得票率) %>%
+  rename(city = 縣市別, district = 行政區別, neighbor = 里別, 
+         KMTvote_2018 = 國民黨候選人得票數, DDPvote_2018 = 民進黨候選人得票數, ballot_2018 = 投票數, 
+         KMTrate_2018 = 國民黨候選人得票率, DDPrate_2018 = 民進黨候選人得票率) %>%
+  unite(city, district, neighbor, col = "neighbor", sep = "/")
+
+kaoshung_2010_to_2018 <- kaoshung_working_2018 %>%
+  left_join(kaoshung_working_2014, by = "neighbor") %>%
+  left_join(kaoshung_working_2010, by = "neighbor") %>%
+  separate(neighbor, into = c("city", "district", "neighbor"))
+
+taipei_working_2010 <- taipei_2010 %>%
+  select(縣市別, 行政區別, 里別, 國民黨候選人得票數, 民進黨候選人得票數, 投票數, 
+            國民黨候選人得票率, 民進黨候選人得票率) %>%
+  rename(city = 縣市別, district = 行政區別, neighbor = 里別, 
+         KMTvote_2010 = 國民黨候選人得票數, DDPvote_2010 = 民進黨候選人得票數, ballot_2010 = 投票數, 
+         KMTrate_2010 = 國民黨候選人得票率, DDPrate_2010 = 民進黨候選人得票率) %>%
+  unite(city, district, neighbor, col = "neighbor", sep = "/")
+
+taipei_working_2014 <- taipei_2014 %>%
+  select(縣市別, 行政區別, 里別, 國民黨候選人得票數, 無黨籍候選人得票數, 
+            投票數, 國民黨候選人得票率, 無黨籍候選人得票率) %>%
+  rename(city = 縣市別, district = 行政區別, neighbor = 里別, 
+         KMTvote_2014 = 國民黨候選人得票數, NPvote_2014 = 無黨籍候選人得票數, ballot_2014 = 投票數, 
+         KMTrate_2014 = 國民黨候選人得票率, NPrate_2010 = 無黨籍候選人得票率) %>%
+  unite(city, district, neighbor, col = "neighbor", sep = "/")
+
+taipei_working_2018 <- taipei_2018 %>%
+  select(縣市別, 行政區別, 里別, 國民黨候選人得票數, 民進黨候選人得票數, 無黨籍候選人得票數, 
+            投票數, 國民黨候選人得票率, 民進黨候選人得票率, 無黨籍候選人得票率) %>%
+  rename(city = 縣市別, district = 行政區別, neighbor = 里別, 
+         KMTvote_2018 = 國民黨候選人得票數, DDPvote_2018 = 民進黨候選人得票數, NPvote_2018 = 無黨籍候選人得票數,
+         ballot_2018 = 投票數, KMTrate_2018 = 國民黨候選人得票率, DDPrate_2018 = 民進黨候選人得票率, 
+         NPrate_2018 = 無黨籍候選人得票率) %>%
+  unite(city, district, neighbor, col = "neighbor", sep = "/")
+
+taipei_2010_to_2018 <- taipei_working_2010 %>%
+  left_join(taipei_working_2014, by = "neighbor") %>%
+  left_join(taipei_working_2018, by = "neighbor") %>%
+  separate(neighbor, into = c("city", "district", "neighbor"))
+
+taiwan_2010_to_2018 <- bind_rows(taipei_2010_to_2018, newtaipei_2010_to_2018, 
+                                 taoyuan_2010_to_2018, taichung_2010_to_2018,
+                                 kaoshung_2010_to_2018) #台南2018年村里重劃，無法放在一起看
 
 ```
 
-```{r ethinicity}
+```{r what have earned should pay a price}
 
 ```
