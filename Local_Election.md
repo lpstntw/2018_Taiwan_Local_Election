@@ -1,0 +1,12 @@
+Local Election
+================
+Po-Sheng Lee
+2018/12/20
+
+![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20pattern%20ballot-1.png)![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20pattern%20ballot-2.png)![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20pattern%20ballot-3.png)![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20pattern%20ballot-4.png)![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20pattern%20ballot-5.png)![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20pattern%20ballot-6.png)
+
+![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20rate-1.png)![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20rate-2.png)![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20rate-3.png)![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20rate-4.png)![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20rate-5.png)![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20rate-6.png)![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20rate-7.png)![](Local_Election_files/figure-markdown_github/2014%20turnout%20and%20voting%20rate-8.png)
+
+![](Local_Election_files/figure-markdown_github/2018%20turnout%20and%20voting%20pattern-1.png)![](Local_Election_files/figure-markdown_github/2018%20turnout%20and%20voting%20pattern-2.png)![](Local_Election_files/figure-markdown_github/2018%20turnout%20and%20voting%20pattern-3.png)![](Local_Election_files/figure-markdown_github/2018%20turnout%20and%20voting%20pattern-4.png)![](Local_Election_files/figure-markdown_github/2018%20turnout%20and%20voting%20pattern-5.png)![](Local_Election_files/figure-markdown_github/2018%20turnout%20and%20voting%20pattern-6.png)
+
+![](Local_Election_files/figure-markdown_github/2014%20vote%20change%20and%202018%20vote%20change-1.png)![](Local_Election_files/figure-markdown_github/2014%20vote%20change%20and%202018%20vote%20change-2.png)![](Local_Election_files/figure-markdown_github/2014%20vote%20change%20and%202018%20vote%20change-3.png)![](Local_Election_files/figure-markdown_github/2014%20vote%20change%20and%202018%20vote%20change-4.png)![](Local_Election_files/figure-markdown_github/2014%20vote%20change%20and%202018%20vote%20change-5.png)
